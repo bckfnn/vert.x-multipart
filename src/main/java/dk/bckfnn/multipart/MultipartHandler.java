@@ -25,7 +25,7 @@ import org.vertx.java.core.streams.ReadStream;
 public class MultipartHandler extends BaseReadStream {
     final static byte[] CRLF = new byte[] { '\r', '\n' };
     final static byte[] MINUSMINUS = new byte[] { '-', '-' };
-    //private byte[] delimiter;
+
     private RecordParser parser = new RecordParser();
     private Part currentPart = null;
 
@@ -158,19 +158,7 @@ public class MultipartHandler extends BaseReadStream {
     }
 
     private void makeFile() {
-        FieldInfo fileInfo = new FieldInfo();
-        Header contentDisposition = currentPart.headers.get("content-disposition");
-        if (contentDisposition != null) {
-            fileInfo.filename = contentDisposition.params.get("filename");
-            fileInfo.name = contentDisposition.params.get("name");
-        }
-
-        Header contentType = currentPart.headers.get("content-type");
-        if (contentType != null) {
-            fileInfo.contentType = contentType.value;
-        }
-        //System.out.println("start file " + fileInfo);
-        fileHandler.handle(fileInfo);
+        fileHandler.handle(currentPart);
     }
 
     public void handleData(Buffer buffer) {
@@ -186,31 +174,29 @@ public class MultipartHandler extends BaseReadStream {
         }
     }
 
-    public static class FieldInfo {
-        public String name;
-        public String contentType;
-        public String filename;
+    public interface FieldInfo {
+        public String getName();
 
-        @Override
-        public String toString() {
-            return "FileInfo [name=" + name + ", contentType=" + contentType + ", filename=" + filename + "]";
-        }
+        public String getFilename();
 
+        public String getContentType();
+
+        public Header getHeader(String headerName);
     }
 
     /**
-     * A part current beeing parsed. The parts form a stack with a pointer to
+     * A part current being parsed. The parts form a stack with a pointer to
      * the parent part.
      */
-    static class Part {
+    static class Part implements FieldInfo {
         public Part(Part parent) {
             this.parent = parent;
         }
 
-        Map<String, Header> headers = new HashMap<>();
-        byte[] boundary;
-        byte[] bodyBoundary;
-        Part parent;
+        private Map<String, Header> headers = new HashMap<>();
+        private byte[] boundary;
+        private byte[] bodyBoundary;
+        private Part parent;
 
         /**
          * Set the boundary for remaining parts. Adds a -- in front of the
@@ -258,13 +244,45 @@ public class MultipartHandler extends BaseReadStream {
         public String toString() {
             return new String(boundary) + " " + headers;
         }
+
+        @Override
+        public String getName() {
+            Header contentDisposition = headers.get("content-disposition");
+            if (contentDisposition != null) {
+                return contentDisposition.params.get("name");
+            }
+            return null;
+        }
+
+        @Override
+        public String getFilename() {
+            Header contentDisposition = headers.get("content-disposition");
+            if (contentDisposition != null) {
+                return contentDisposition.params.get("filename");
+            }
+            return null;
+        }
+
+        @Override
+        public String getContentType() {
+            Header contentType = headers.get("content-type");
+            if (contentType != null) {
+                return contentType.value;
+            }
+            return null;
+        }
+
+        @Override
+        public Header getHeader(String headerName) {
+            return headers.get(headerName);
+        }
     }
 
     /**
      * Utility class for parsing headers keys and values. It can parse and
      * return the tokens that makes up a header.
      */
-    static class Header {
+    public static class Header {
         String name;
         String value;
         Map<String, String> params = new HashMap<>();

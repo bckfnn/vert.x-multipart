@@ -25,6 +25,7 @@ import org.vertx.java.core.buffer.Buffer;
 
 import dk.bckfnn.multipart.MultipartHandler;
 import dk.bckfnn.multipart.MultipartHandler.FieldInfo;
+import dk.bckfnn.multipart.MultipartHandler.Header;
 import dk.bckfnn.multipart.MultipartHandler.RecordParser;
 
 public class MultiPartTest {
@@ -242,7 +243,9 @@ public class MultiPartTest {
             @Override
             public void handle(FieldInfo field) {
                 final FileInfo file = new FileInfo();
-                file.field = field;
+                file.name = field.getName();
+                file.filename = field.getFilename();
+                file.contentType = field.getContentType();
                 file.content = new Buffer();
 
                 partHandler.dataHandler(new Handler<Buffer>() {
@@ -274,22 +277,25 @@ public class MultiPartTest {
         }
     }
 
-    static class FileInfo {
-        FieldInfo field = new FieldInfo();
+    static class FileInfo implements FieldInfo {
+
+        String name;
+        String filename;
+        String contentType;
         Buffer content;
 
         public FileInfo filename(String name) {
-            field.filename = name;
+            this.filename = name;
             return this;
         }
 
         public FileInfo name(String name) {
-            field.name = name;
+            this.name = name;
             return this;
         }
 
         public FileInfo contentType(String contentType) {
-            field.contentType = contentType;
+            this.contentType = contentType;
             return this;
         }
 
@@ -303,8 +309,27 @@ public class MultiPartTest {
          */
         @Override
         public String toString() {
-            return "FileInfo [filename=" + field.filename + ", contentType=" + field.contentType + ", name=" + field.name + ", content=" + content + "]";
+            return "FileInfo [filename=" + filename + ", contentType=" + contentType + ", name=" + name + ", content=" + content + "]";
         }
 
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public String getFilename() {
+            return filename;
+        }
+
+        @Override
+        public String getContentType() {
+            return contentType;
+        }
+
+        @Override
+        public Header getHeader(String headerName) {
+            return null;
+        }
     }
 }
