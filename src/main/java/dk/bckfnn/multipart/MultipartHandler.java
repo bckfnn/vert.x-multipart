@@ -114,10 +114,10 @@ public class MultipartHandler extends BaseReadStream {
                     Header contentTransferEncoding = currentPart.headers.get("content-transfer-encoding");
                     if (contentTransferEncoding != null && contentTransferEncoding.value.equals("base64")) {
                         Base64DecodeHandler b64 = new Base64DecodeHandler();
-                        b64.dataHandler(dataHandler);
-                        b64.endHandler(endHandler);
-                        b64.exceptionHandler(exceptionHandler);
-                        b64.input(this);
+                        b64.dataHandler(currentPart.dataHandler);
+                        b64.endHandler(currentPart.endHandler);
+                        b64.exceptionHandler(currentPart.exceptionHandler);
+                        b64.input(currentPart);
                     }
 
                     state = State.BODY;
@@ -135,14 +135,11 @@ public class MultipartHandler extends BaseReadStream {
                 return false;
             }
             //System.out.println("file data: " + b);
-            if (dataHandler != null) {
-                dataHandler.handle(b);
-            }
+            currentPart.handleData(b);
+
             if (parser.delimiterFound) {
-                if (endHandler != null) {
-                    endHandler.handle(null);
-                    state = State.PREHEADERS;
-                }
+                currentPart.handleEnd();
+                state = State.PREHEADERS;
             }
             break;
         case END:
@@ -172,9 +169,10 @@ public class MultipartHandler extends BaseReadStream {
         if (state != State.END) {
             handleException(new RuntimeException("illegal end state"));
         }
+        super.handleEnd();
     }
 
-    public interface FieldInfo {
+    public interface FieldInfo extends ReadStream {
         public String getName();
 
         public String getFilename();
@@ -188,7 +186,7 @@ public class MultipartHandler extends BaseReadStream {
      * A part current being parsed. The parts form a stack with a pointer to
      * the parent part.
      */
-    static class Part implements FieldInfo {
+    static class Part extends BaseReadStream implements FieldInfo {
         public Part(Part parent) {
             this.parent = parent;
         }

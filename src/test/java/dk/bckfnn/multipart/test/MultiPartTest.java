@@ -25,7 +25,6 @@ import org.vertx.java.core.buffer.Buffer;
 
 import dk.bckfnn.multipart.MultipartHandler;
 import dk.bckfnn.multipart.MultipartHandler.FieldInfo;
-import dk.bckfnn.multipart.MultipartHandler.Header;
 import dk.bckfnn.multipart.MultipartHandler.RecordParser;
 
 public class MultiPartTest {
@@ -248,12 +247,12 @@ public class MultiPartTest {
                 file.contentType = field.getContentType();
                 file.content = new Buffer();
 
-                partHandler.dataHandler(new Handler<Buffer>() {
+                field.dataHandler(new Handler<Buffer>() {
                     public void handle(Buffer buf) {
                         file.content.appendBuffer(buf);
                     }
                 });
-                partHandler.endHandler(new Handler<Void>() {
+                field.endHandler(new Handler<Void>() {
                     public void handle(Void arg) {
                         files.add(file);
                     }
@@ -269,7 +268,7 @@ public class MultiPartTest {
 
         istr.process(buf);
 
-        //System.out.println(files);
+        System.out.println(files);
         Assert.assertEquals(expected.length, files.size());
         for (int i = 0; i < files.size(); i++) {
             Assert.assertEquals(expected[i].getClass(), files.get(i).getClass());
@@ -277,8 +276,7 @@ public class MultiPartTest {
         }
     }
 
-    static class FileInfo implements FieldInfo {
-
+    static class FileInfo {
         String name;
         String filename;
         String contentType;
@@ -310,26 +308,6 @@ public class MultiPartTest {
         @Override
         public String toString() {
             return "FileInfo [filename=" + filename + ", contentType=" + contentType + ", name=" + name + ", content=" + content + "]";
-        }
-
-        @Override
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public String getFilename() {
-            return filename;
-        }
-
-        @Override
-        public String getContentType() {
-            return contentType;
-        }
-
-        @Override
-        public Header getHeader(String headerName) {
-            return null;
         }
     }
 }
