@@ -204,7 +204,7 @@ public class MultipartHandler extends BaseReadStream {
      * A part current being parsed. The parts form a stack with a pointer to
      * the parent part.
      */
-    static class Part extends BaseReadStream implements FieldInfo {
+    class Part extends BaseReadStream implements FieldInfo {
         public Part(Part parent) {
             this.parent = parent;
         }
@@ -291,6 +291,16 @@ public class MultipartHandler extends BaseReadStream {
         @Override
         public Header getHeader(String headerName) {
             return headers.get(headerName);
+        }
+
+        @Override
+        public void pause() {
+            MultipartHandler.this.pause();
+        }
+
+        @Override
+        public void resume() {
+            MultipartHandler.this.resume();
         }
     }
 
