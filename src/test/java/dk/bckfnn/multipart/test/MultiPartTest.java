@@ -85,7 +85,8 @@ public class MultiPartTest {
         };
         test("AaB03x", body,
                 new FileInfo().name("submit-name").content("Larry\r\n"),
-                new FileInfo().name("files").filename("file1.txt").content("... contents of file1.txt ...").contentType("text/plain"));
+                new FileInfo().name("files").filename("file1.txt").content("... contents of file1.txt ...").contentType("text/plain"),
+                "success");
     }
 
     @Test
@@ -99,7 +100,8 @@ public class MultiPartTest {
                 "--boundary--",
         };
         test("boundary", body,
-                new FileInfo().content("blarggghhh"));
+                new FileInfo().content("blarggghhh"),
+                "success");
     }
 
     @Test
@@ -171,7 +173,8 @@ public class MultiPartTest {
         String t = "The quick brown fox jumps over the lazy dog. ";
         test("AaB03x", body,
                 new FileInfo().name("reply").content("yes"),
-                new FileInfo().name("fileupload").filename("hello world.txt").contentType("image/jpeg").content(t + t + t + t));
+                new FileInfo().name("fileupload").filename("hello world.txt").contentType("image/jpeg").content(t + t + t + t),
+                "success");
     }
 
     @Test
@@ -223,7 +226,8 @@ public class MultiPartTest {
                 new FileInfo().filename("hello2.txt").content("hello to the world").contentType("text/plain"),
                 new FileInfo().filename("hello3.txt").content("hello, free the world").contentType("text/plain"),
                 new FileInfo().filename("hello4.txt").content("hello for the world").contentType("text/plain"),
-                new FileInfo().filename("hello-outer.txt").content("hello, outer world").contentType("text/plain"));
+                new FileInfo().filename("hello-outer.txt").content("hello, outer world").contentType("text/plain"),
+                "success");
     }
 
     public void test(String boundary, String[] body, Object... expected) {
@@ -263,6 +267,11 @@ public class MultiPartTest {
             @Override
             public void handle(Exception exc) {
                 files.add(exc);
+            }
+        });
+        partHandler.endHandler(new Handler<Void>() {
+            public void handle(Void arg) {
+                files.add("success");
             }
         });
 

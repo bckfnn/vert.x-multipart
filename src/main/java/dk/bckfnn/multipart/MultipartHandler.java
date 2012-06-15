@@ -158,6 +158,7 @@ public class MultipartHandler extends BaseReadStream {
         fileHandler.handle(currentPart);
     }
 
+    @Override
     public void handleData(Buffer buffer) {
         parser.add(buffer);
         while (parse() && !exception) {
@@ -165,11 +166,13 @@ public class MultipartHandler extends BaseReadStream {
         }
     }
 
+    @Override
     public void handleEnd() {
         if (state != State.END) {
             handleException(new RuntimeException("illegal end state"));
+        } else {
+            super.handleEnd();
         }
-        super.handleEnd();
     }
 
     public interface FieldInfo extends ReadStream {
