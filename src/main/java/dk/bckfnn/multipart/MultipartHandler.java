@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
+import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.streams.ReadStream;
 
 public class MultipartHandler extends BaseReadStream {
@@ -41,6 +42,20 @@ public class MultipartHandler extends BaseReadStream {
     }
 
     State state = State.PREAMPLE;
+
+    public MultipartHandler(HttpServerRequest request) {
+        String contentType = request.headers().get("Content-Type");
+        System.out.println(contentType);
+        Header h = new Header("content-type:" + contentType);
+        System.out.println(h.value);
+        if (h.value.equals("multipart/form-data")) {
+            input(request);
+            currentPart = new Part(null);
+            currentPart.boundary = h.params.get("boundary").getBytes();
+        } else {
+            throw new RuntimeException("request is not multipart/form-data");
+        }
+    }
 
     public MultipartHandler(final byte[] boundary, ReadStream inputStream) {
         super(inputStream);
