@@ -20,8 +20,14 @@ import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.streams.ReadStream;
 
 /**
- * A convenient base class for ReadStream filters. The output ReadStream can be
- * specified in the constructor or by calling input(ReadStream).
+ * A convenient base class for ReadStream filters.
+ * 
+ * The output ReadStream can be specified in the constructor or by calling
+ * input(ReadStream).
+ * 
+ * Normally a subclass will override handleData() and handleEnd(), perform some
+ * processing of the data and call super.handleData() and super.handlerEnd() to
+ * send the processed data to the listening ReadStream.
  */
 public class BaseReadStream implements ReadStream {
 
@@ -30,7 +36,8 @@ public class BaseReadStream implements ReadStream {
     protected Handler<Buffer> dataHandler;
     protected Handler<Void> endHandler;
     protected Handler<Exception> exceptionHandler;
-    // An exception have occurred.
+
+    // An exception have occurred. Ignore any further events from the input.
     protected boolean exception;
 
     public BaseReadStream() {
