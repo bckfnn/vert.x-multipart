@@ -417,7 +417,7 @@ public class MultipartHandler extends BaseReadStream {
     }
 
     /**
-     * A simple copy of RecordParser, itonly does delimited but allow for
+     * A simple copy of RecordParser, it only does delimited but allow for
      * sending output packages
      * when the size of the buffer reach the max.
      * 
@@ -430,7 +430,7 @@ public class MultipartHandler extends BaseReadStream {
 
         private int pos; // Current position in buffer
         private int start; // Position of beginning of current record
-        private int delimPos; // Position of current match in delimeter array
+        private int delimPos; // Position of current match in delimiter array
         public boolean delimiterFound = false;
 
         public void add(Buffer buffer) {
