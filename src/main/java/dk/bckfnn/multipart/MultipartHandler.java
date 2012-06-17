@@ -31,7 +31,7 @@ public class MultipartHandler extends BaseReadStream {
     private Part currentPart = null;
 
     private String header;
-    private Handler<FieldInfo> fileHandler;
+    private Handler<FieldInfo> fieldHandler;
 
     enum State {
         PREAMPLE,
@@ -64,7 +64,7 @@ public class MultipartHandler extends BaseReadStream {
     }
 
     public MultipartHandler fieldHandler(Handler<FieldInfo> fileHandler) {
-        this.fileHandler = fileHandler;
+        this.fieldHandler = fileHandler;
         return this;
     }
 
@@ -170,7 +170,7 @@ public class MultipartHandler extends BaseReadStream {
     }
 
     private void makeFile() {
-        fileHandler.handle(currentPart);
+        fieldHandler.handle(currentPart);
     }
 
     @Override
