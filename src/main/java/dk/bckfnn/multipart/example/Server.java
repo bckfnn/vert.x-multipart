@@ -31,7 +31,7 @@ public class Server extends Verticle {
                 }
                 if (request.path.equals("/submit")) {
                     MultipartHandler multipartHandler = new MultipartHandler(request);
-                    multipartHandler.setFileHandler(new Handler<FieldInfo>() {
+                    multipartHandler.fieldHandler(new Handler<FieldInfo>() {
                         @Override
                         public void handle(final FieldInfo field) {
                             ReadStream md5 = new Md5Handler(field);

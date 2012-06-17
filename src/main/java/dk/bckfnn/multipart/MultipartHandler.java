@@ -63,7 +63,7 @@ public class MultipartHandler extends BaseReadStream {
         currentPart.boundary(boundary);
     }
 
-    public MultipartHandler setFileHandler(Handler<FieldInfo> fileHandler) {
+    public MultipartHandler fieldHandler(Handler<FieldInfo> fileHandler) {
         this.fileHandler = fileHandler;
         return this;
     }

@@ -242,7 +242,7 @@ public class MultiPartTest {
         TestReadStream istr = new TestReadStream();
         final MultipartHandler partHandler = new MultipartHandler(boundary.getBytes(), istr);
 
-        partHandler.setFileHandler(new Handler<FieldInfo>() {
+        partHandler.fieldHandler(new Handler<FieldInfo>() {
             @Override
             public void handle(FieldInfo field) {
                 final FileInfo file = new FileInfo();
