@@ -132,7 +132,6 @@ public class Base64DecodeHandler extends BaseReadStream {
                 }
             }
         }
-        // TODO Auto-generated method stub
         super.handleEnd();
     }
 
